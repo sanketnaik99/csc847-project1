@@ -2,6 +2,7 @@ import axios from "axios";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export interface Student {
   sid: number;
@@ -10,6 +11,9 @@ export interface Student {
   email: string;
   mailingAddress: string;
   gpa: number;
+  firstNameNC?: string;
+  lastNameNC?: string;
+  sidSTR?: string;
 }
 
 interface StudentRequest {
@@ -41,10 +45,27 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="">
-        <h1 className="text-center mt-5 font-bold font-sans text-3xl md:text-4xl text-gray-700">
+      <div className="flex flex-row justify-between">
+        <h1 className="text-center mt-5 font-bold font-sans text-3xl md:text-4xl ml-4 text-gray-700">
           The StudentDB
         </h1>
+        <Link href="/add-student">
+          <button className="flex flex-row bg-blue-500 mr-4 mt-4 px-4 py-2 rounded-lg items-center justify-center text-white font-semibold hover:bg-blue-600 hover:shadow-md shadow-sm">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-3 text-white"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Add Student
+          </button>
+        </Link>
       </div>
 
       <div className="mt-8 mx-1 sm:mx-2 md:mx-4">

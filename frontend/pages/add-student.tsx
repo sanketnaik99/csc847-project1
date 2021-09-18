@@ -34,9 +34,15 @@ const AddStudent = () => {
   // Form Submit Handler
   const handleFormSubmit = async (values: Student, resetForm: any) => {
     setLoading(true);
+    const student: Student = {
+      ...values,
+      firstNameNC: values.firstName.toLowerCase(),
+      lastNameNC: values.lastName.toLowerCase(),
+      sidSTR: values.sid.toString(),
+    };
     const data = await axios.post(
       "http://localhost:3000/api/v1/add-student",
-      values
+      student
     );
     console.log(data);
     if (data.status == 200) {
@@ -73,7 +79,7 @@ const AddStudent = () => {
           {({ errors, touched, handleChange, handleSubmit, values }) => (
             <form
               onSubmit={handleSubmit}
-              className="w-full flex flex-col items-center"
+              className="w-full flex flex-col items-center mt-5"
             >
               {/* Student ID Field */}
               <div className="relative mb-4 px-4 w-full sm:w-3/4 md:w-1/2 lg:w-1/3">
