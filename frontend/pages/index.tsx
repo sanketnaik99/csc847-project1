@@ -30,7 +30,7 @@ const Home: NextPage = () => {
 
   const fetchStudents = async () => {
     const data = await axios.get<StudentRequest>(
-      "http://localhost:3000/api/v1/get-students"
+      `${process.env.NEXT_PUBLIC_APP_URL}/api/v1/get-students`
     );
     if (data.status == 200) {
       setStudents(data.data.students);
@@ -54,7 +54,7 @@ const Home: NextPage = () => {
     } else {
       const sid = values.sid === 0 ? "" : values.sid.toString();
       const data = await axios.post<StudentRequest>(
-        "http://localhost:3000/api/v1/search-student",
+        `${process.env.NEXT_PUBLIC_APP_URL}/api/v1/search-student`,
         { firstName: values.firstName, lastName: values.lastName, sid: sid }
       );
       if (data.status == 200) {

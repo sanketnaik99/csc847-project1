@@ -41,7 +41,7 @@ const AddStudent = () => {
       sidSTR: values.sid.toString(),
     };
     const data = await axios.post(
-      "http://localhost:3000/api/v1/add-student",
+      `${process.env.NEXT_PUBLIC_APP_URL}/api/v1/add-student`,
       student
     );
     console.log(data);
