@@ -3,6 +3,9 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Formik } from "formik";
+import Image from "next/image";
+import NotFound from "../public/assets/not-found.png";
 
 export interface Student {
   sid: number;
@@ -37,6 +40,29 @@ const Home: NextPage = () => {
   useEffect(() => {
     fetchStudents();
   }, []);
+
+  const searchFormHandler = async (
+    values: { firstName: string; lastName: string; sid: number },
+    resetForm: any
+  ) => {
+    if (
+      values.firstName === "" &&
+      values.lastName === "" &&
+      (values.sid === 0 || values.sid.toString() === "")
+    ) {
+      fetchStudents();
+    } else {
+      const sid = values.sid === 0 ? "" : values.sid.toString();
+      const data = await axios.post<StudentRequest>(
+        "http://localhost:3000/api/v1/search-student",
+        { firstName: values.firstName, lastName: values.lastName, sid: sid }
+      );
+      if (data.status == 200) {
+        setStudents(data.data.students);
+      }
+    }
+  };
+
   return (
     <div>
       <Head>
@@ -46,14 +72,14 @@ const Home: NextPage = () => {
       </Head>
 
       <div className="flex flex-row justify-between">
-        <h1 className="text-center mt-5 font-bold font-sans text-3xl md:text-4xl ml-4 text-gray-700">
+        <h1 className="text-center mt-5 font-bold font-sans text-xl sm:text-3xl md:text-4xl ml-2 sm:ml-4 text-gray-700">
           The StudentDB
         </h1>
         <Link href="/add-student">
-          <button className="flex flex-row bg-blue-500 mr-4 mt-4 px-4 py-2 rounded-lg items-center justify-center text-white font-semibold hover:bg-blue-600 hover:shadow-md shadow-sm">
+          <button className="flex flex-row bg-blue-500 mr-2 sm:mr-4 mt-4 px-2 sm:px-4 py-2 rounded-lg items-center justify-center text-white font-semibold hover:bg-blue-600 hover:shadow-md shadow-sm">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 mr-3 text-white"
+              className="h-5 w-5 mr-2 sm:mr-3 text-white"
               viewBox="0 0 20 20"
               fill="currentColor"
             >
@@ -68,38 +94,134 @@ const Home: NextPage = () => {
         </Link>
       </div>
 
-      <div className="mt-8 mx-1 sm:mx-2 md:mx-4">
-        <div className="w-full overflow-x-auto pb-3 scrollbar scrollbar-thumb-gray-300 scrollbar-thin scrollbar-thumb-rounded-md lg:scrollbar-thumb-transparent lg:scrollbar-track-transparent scrollbar-track-gray-100">
-          <table className="w-full table-auto border-collapse md:rounded-xl rounded-sm overflow-hidden shadow-sm">
-            <thead className="text-left font-semibold text-gray-900 bg-blue-50 uppercase">
-              <tr className="lg:text-lg text-sm whitespace-nowrap">
-                <th className="px-3 py-2">Student ID</th>
-                <th className="px-3 py-2">First Name</th>
-                <th className="px-3 py-2">Last Name</th>
-                <th className="px-3 py-2">Email</th>
-                <th className="px-3 py-2">Mailing Address</th>
-                <th className="px-3 py-2">GPA</th>
-              </tr>
-            </thead>
-            <tbody>
-              {students.length > 0
-                ? students.map((student) => (
-                    <tr key={student.sid + student.firstName}>
-                      <td className="px-3 py-2 border">{student.sid}</td>
-                      <td className="px-3 py-2 border">{student.firstName}</td>
-                      <td className="px-3 py-2 border">{student.lastName}</td>
-                      <td className="px-3 py-2 border">{student.email}</td>
-                      <td className="px-3 py-2 border">
-                        {student.mailingAddress}
-                      </td>
-                      <td className="px-3 py-2 border">{student.gpa}</td>
-                    </tr>
-                  ))
-                : null}
-            </tbody>
-          </table>
+      <Formik
+        initialValues={{
+          firstName: "",
+          lastName: "",
+          sid: 0,
+        }}
+        onSubmit={(values, { resetForm }) => {
+          searchFormHandler(values, resetForm);
+        }}
+      >
+        {({ values, handleChange, handleSubmit }) => (
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-row items-center justify-center flex-wrap  mt-10"
+          >
+            <div className="relative mb-4 px-4 w-full md:w-1/2 lg:w-1/4">
+              <label
+                htmlFor="fname"
+                className="leading-7 text-sm text-gray-600"
+              >
+                First Name
+              </label>
+              <input
+                type="string"
+                onChange={handleChange}
+                id="fname"
+                name="firstName"
+                value={values.firstName}
+                className="w-full bg-white rounded border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+              />
+            </div>
+            <div className="relative mb-4 px-4 w-full md:w-1/2 lg:w-1/4">
+              <label
+                htmlFor="lname"
+                className="leading-7 text-sm text-gray-600"
+              >
+                Last Name
+              </label>
+              <input
+                type="string"
+                onChange={handleChange}
+                id="lname"
+                name="lastName"
+                value={values.lastName}
+                className="w-full bg-white rounded border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+              />
+            </div>
+            <div className="relative mb-4 px-4 w-full md:w-1/2 lg:w-1/4">
+              <label htmlFor="sid" className="leading-7 text-sm text-gray-600">
+                Student ID
+              </label>
+              <input
+                type="number"
+                onChange={handleChange}
+                id="sid"
+                name="sid"
+                value={values.sid}
+                className="w-full bg-white rounded border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+              />
+            </div>
+            <button
+              onClick={() => handleSubmit}
+              type="submit"
+              className="flex flex-row bg-blue-500 mr-4 mt-2 px-4 py-3 rounded-lg items-center justify-center text-white font-semibold hover:bg-blue-600 hover:shadow-md shadow-sm"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-3"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+              Search
+            </button>
+          </form>
+        )}
+      </Formik>
+
+      {students.length > 0 ? (
+        <div className="mt-8 mx-1 sm:mx-2 md:mx-4">
+          <div className="w-full overflow-x-auto pb-3 scrollbar scrollbar-thumb-gray-300 scrollbar-thin scrollbar-thumb-rounded-md lg:scrollbar-thumb-transparent lg:scrollbar-track-transparent scrollbar-track-gray-100">
+            <table className="w-full table-auto border-collapse md:rounded-xl rounded-sm overflow-hidden shadow-sm">
+              <thead className="text-left font-semibold text-gray-900 bg-blue-50 uppercase">
+                <tr className="lg:text-lg text-sm whitespace-nowrap">
+                  <th className="px-3 py-2">Student ID</th>
+                  <th className="px-3 py-2">First Name</th>
+                  <th className="px-3 py-2">Last Name</th>
+                  <th className="px-3 py-2">Email</th>
+                  <th className="px-3 py-2">Mailing Address</th>
+                  <th className="px-3 py-2">GPA</th>
+                </tr>
+              </thead>
+              <tbody>
+                {students.length > 0
+                  ? students.map((student) => (
+                      <tr key={student.sid + student.firstName}>
+                        <td className="px-3 py-2 border">{student.sid}</td>
+                        <td className="px-3 py-2 border">
+                          {student.firstName}
+                        </td>
+                        <td className="px-3 py-2 border">{student.lastName}</td>
+                        <td className="px-3 py-2 border">{student.email}</td>
+                        <td className="px-3 py-2 border">
+                          {student.mailingAddress}
+                        </td>
+                        <td className="px-3 py-2 border">{student.gpa}</td>
+                      </tr>
+                    ))
+                  : null}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center mt-12 mb-12">
+          <div className="w-1/2 md:w-1/4">
+            <Image src={NotFound} placeholder="blur" />
+          </div>
+          <h3 className="font-semibold text-xl">No Students Found!</h3>
+        </div>
+      )}
       <div className="flex flex-row justify-center mt-4">
         <button
           className="flex flex-row bg-blue-500 px-4 py-3 rounded-lg items-center justify-center text-white font-semibold hover:bg-blue-600 hover:shadow-md shadow-sm"
