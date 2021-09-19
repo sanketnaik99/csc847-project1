@@ -29,9 +29,7 @@ const Home: NextPage = () => {
   const [students, setStudents] = useState<Student[]>([]);
 
   const fetchStudents = async () => {
-    const data = await axios.get<StudentRequest>(
-      `${process.env.NEXT_PUBLIC_APP_URL}/api/v1/get-students`
-    );
+    const data = await axios.get<StudentRequest>(`/api/get-students`);
     if (data.status == 200) {
       setStudents(data.data.students);
     }
@@ -53,10 +51,11 @@ const Home: NextPage = () => {
       fetchStudents();
     } else {
       const sid = values.sid === 0 ? "" : values.sid.toString();
-      const data = await axios.post<StudentRequest>(
-        `${process.env.NEXT_PUBLIC_APP_URL}/api/v1/search-student`,
-        { firstName: values.firstName, lastName: values.lastName, sid: sid }
-      );
+      const data = await axios.post<StudentRequest>(`/api/search-student`, {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        sid: sid,
+      });
       if (data.status == 200) {
         setStudents(data.data.students);
       }

@@ -40,10 +40,7 @@ const AddStudent = () => {
       lastNameNC: values.lastName.toLowerCase(),
       sidSTR: values.sid.toString(),
     };
-    const data = await axios.post(
-      `${process.env.NEXT_PUBLIC_APP_URL}/api/v1/add-student`,
-      student
-    );
+    const data = await axios.post(`/api/add-student`, student);
     console.log(data);
     if (data.status == 200) {
       console.log(resetForm);
