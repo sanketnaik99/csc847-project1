@@ -59,7 +59,7 @@ const AddStudent = () => {
       <div className="flex flex-col items-center mt-20 w-full">
         <h1 className="text-3xl font-bold px-3">Add Student</h1>
         <h4 className="text-xl font-medium text-gray-600 pt-3 text-center px-3">
-          Fill out the form below to add a new student's information to the
+          Fill out the form below to add a new student&apos;s information to the
           database.
         </h4>
         <Formik
