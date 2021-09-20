@@ -1,34 +1,59 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# CSC 847: Project 1
 
-## Getting Started
+## Project Introduction
 
-First, run the development server:
+This project has been built using Next.js and Google's Cloud Firestore. Next.js is a react framework that includes extra features such as server-side rendering. Cloud Firestore is a document-based NoSQL database where the data is stored in the form of collections and documents.
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+![Project Stucture](docs/project-structure.png)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### **Frontend**
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+The frontend of the project was built using Next.js and TailwindCSS. It consists of two pages as follows -
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+#### Home Page
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+![Home Page](docs/home-page.png)
 
-## Learn More
+The home page of the application displays a table that shows the information of all the students in the database. This page also contains the search form that can be used to search for any specific student's information. The home page has a button called 'Add Student' which redirects the user to the **Add Student page**.
 
-To learn more about Next.js, take a look at the following resources:
+#### Add Student Page
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+![Add Student Page](docs/add-student-page.png)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+The add student page consists of a form that can be used to add a new student to the database. Form validation has been added to the add student form which prompts the user in case of a bad or invalid input such as an improper email or a missing field.
 
-## Deploy on Vercel
+### **Backend**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The backend consists of 3 API endpoints which are called from the frontend. The backend is also responsible for adding and reading data from the database. The 3 API endpoints are as follows -
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+#### Get Students
+
+This endpoint is called when the homepage loads. It fetches all the entries from the database and returns them to the frontend as an array of `Student` objects.
+
+#### Add Student
+
+The add student endpoint gets called when a user submits the add student form. It receives the student's information from the frontend and adds it to the database.
+
+#### Search Student
+
+The search student endpoint is called when a user submits the search form on the homepage. This endpoint searches the database and returns the information of students that match the 3 parameters - first name, last name and student ID.
+
+## GCP Experience
+
+I have typically deployed Next.js projects on platforms such as Firebase, Netlify and Vercel. These platforms have been built to host static sites and do not host the backend or the database.
+
+GCP provides an all-inclusive solution for hosting full-stack applications by providing the database (Cloud Firestore for this project) and the compute engine in one place.
+
+Deploying the application on Google Compute Engine was fairly simple and updating the application after a new change has been made takes very little time.
+
+## Problems Faced while Building the Project
+
+One of the key challenges for this project was building the **Search Student** endpoint. Since Cloud Firestore does not support full-text search, a workaround had to be implemented. I was able to solve the problem by utilizing Cloud Firestore's query mechanism followed by some filtering in the backend. Doing this allowed me to implement the partial search feature (searching by typing a part of a student's name) and the multiple field search feature (searching by first name, last name and sid at the same time).
+
+## Additional Screenshots
+
+1. Search - When results are found
+   ![Search Results](docs/search-results.png)
+
+2. Search - When no results are found
+   ![No Search Results](docs/no-search-results.png)
