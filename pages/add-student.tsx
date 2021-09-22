@@ -3,6 +3,7 @@ import { Formik } from "formik";
 import React, { useState } from "react";
 import { object, string, number } from "yup";
 import { Student } from ".";
+import Link from "next/link";
 
 const AddStudent = () => {
   const [isLoading, setLoading] = useState(false);
@@ -53,7 +54,26 @@ const AddStudent = () => {
 
   return (
     <div>
-      <div className="flex flex-col items-center mt-20 w-full">
+      <Link href="/">
+        <button className="flex flex-row rounded-lg bg-blue-600 text-white px-4 py-3 mt-4 ml-4 hover:bg-blue-700 hover:shadow-md">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6 mr-3"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+            />
+          </svg>
+          Home
+        </button>
+      </Link>
+      <div className="flex flex-col items-center mt-5 w-full">
         <h1 className="text-3xl font-bold px-3">Add Student</h1>
         <h4 className="text-xl font-medium text-gray-600 pt-3 text-center px-3">
           Fill out the form below to add a new student&apos;s information to the
