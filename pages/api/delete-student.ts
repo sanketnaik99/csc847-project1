@@ -8,6 +8,8 @@ type StandardResponse = {
   message: string;
 };
 
+type StudentResponse = StandardResponse & { students: Student[] };
+
 const db = new Firestore({
   projectId: "csc-8-326008",
   keyFilename: "./keys.json",
@@ -17,25 +19,17 @@ const handler = async (
   req: NextApiRequest,
   res: NextApiResponse<StandardResponse>
 ) => {
-  console.log(req.body);
   try {
-    const docRef = await db.collection("Students").doc();
-    const dataRef = await docRef.set({
-      ...(req.body as Student),
-      docID: docRef.id,
+    const ref = await db.collection("Students").doc(req.body.id).delete();
+    return res.status(200).send({
+      status: "SUCCESS",
+      message: "Successfully deleted the student's record.",
     });
-    if (docRef.id) {
-      return res.status(200).send({
-        status: "SUCCESS",
-        message: "Student added to database successfully.",
-      });
-    }
   } catch (error) {
-    console.log(error);
     return res.status(500).send({
       status: "ERROR",
       message:
-        "There was an error while adding the student to the database. Please try again!",
+        "There was an error while deleting the student's record. Please try again.",
     });
   }
 };

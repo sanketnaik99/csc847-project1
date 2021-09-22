@@ -8,4 +8,5 @@ export interface Student {
   firstNameNC?: string;
   lastNameNC?: string;
   sidSTR?: string;
+  docID: string;
 }
