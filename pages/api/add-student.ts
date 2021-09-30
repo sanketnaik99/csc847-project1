@@ -10,7 +10,11 @@ type StandardResponse = {
 
 const db = new Firestore({
   projectId: "csc-8-326008",
-  keyFilename: "./keys.json",
+  // keyFilename: "./keys.json",
+  credentials: {
+    private_key: process.env.PRIVATE_KEY,
+    client_email: process.env.CLIENT_EMAIL,
+  },
 });
 
 const handler = async (

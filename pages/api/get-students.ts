@@ -12,7 +12,11 @@ type StudentResponse = StandardResponse & { students: Student[] };
 
 const db = new Firestore({
   projectId: "csc-8-326008",
-  keyFilename: "./keys.json",
+  // keyFilename: "./keys.json",
+  credentials: {
+    private_key: process.env.PRIVATE_KEY,
+    client_email: process.env.CLIENT_EMAIL,
+  },
 });
 
 const handler = async (
@@ -31,6 +35,7 @@ const handler = async (
       message: "Successfully retrieved student data.",
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).send({
       students: [],
       status: "ERROR",

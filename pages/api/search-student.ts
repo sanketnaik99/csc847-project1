@@ -12,7 +12,11 @@ type StudentResponse = StandardResponse & { students: Student[] };
 
 const db = new Firestore({
   projectId: "csc-8-326008",
-  keyFilename: "./keys.json",
+  // keyFilename: "./keys.json",
+  credentials: {
+    private_key: process.env.PRIVATE_KEY,
+    client_email: process.env.CLIENT_EMAIL,
+  },
 });
 
 const filterDocs = async (
@@ -70,13 +74,11 @@ const handler = async (
         req.body.lastName,
         req.body.sid
       );
-      res
-        .status(200)
-        .send({
-          status: "SUCCESS",
-          message: "Successfully retrieved student data.",
-          students: filteredStudents,
-        });
+      res.status(200).send({
+        status: "SUCCESS",
+        message: "Successfully retrieved student data.",
+        students: filteredStudents,
+      });
     } else if (req.body.lastName) {
       console.log("Last Name is present");
       const data = await db
@@ -89,13 +91,11 @@ const handler = async (
         req.body.lastName,
         req.body.sid
       );
-      res
-        .status(200)
-        .send({
-          status: "SUCCESS",
-          message: "Successfully retrieved student data.",
-          students: filteredStudents,
-        });
+      res.status(200).send({
+        status: "SUCCESS",
+        message: "Successfully retrieved student data.",
+        students: filteredStudents,
+      });
     } else {
       console.log("SID is present");
       const data = await db
@@ -108,23 +108,19 @@ const handler = async (
         req.body.lastName,
         req.body.sid
       );
-      res
-        .status(200)
-        .send({
-          status: "SUCCESS",
-          message: "Successfully retrieved student data.",
-          students: filteredStudents,
-        });
+      res.status(200).send({
+        status: "SUCCESS",
+        message: "Successfully retrieved student data.",
+        students: filteredStudents,
+      });
     }
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .send({
-        status: "ERROR",
-        message: "Error retrieving student data",
-        students: [],
-      });
+    return res.status(500).send({
+      status: "ERROR",
+      message: "Error retrieving student data",
+      students: [],
+    });
   }
 };
 
