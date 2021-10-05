@@ -16,6 +16,7 @@
 /build
 
 keys.json
+.env
 
 # misc
 .DS_Store
