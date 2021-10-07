@@ -4,6 +4,26 @@ import React, { useState } from "react";
 import { object, string, number } from "yup";
 import { Student } from ".";
 import Link from "next/link";
+import { initializeApp } from "@firebase/app";
+import {
+  addDoc,
+  collection,
+  getFirestore,
+  updateDoc,
+} from "@firebase/firestore";
+
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_APP_ID,
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+
+const db = getFirestore();
 
 const AddStudent = () => {
   const [isLoading, setLoading] = useState(false);
@@ -41,15 +61,18 @@ const AddStudent = () => {
       lastNameNC: values.lastName.toLowerCase(),
       sidSTR: values.sid.toString(),
     };
-    const data = await axios.post(`/api/add-student`, student);
-    console.log(data);
-    if (data.status == 200) {
-      console.log(resetForm);
+    const docRef = await addDoc(collection(db, "Students"), student);
+    if (docRef.id) {
+      await updateDoc(docRef, { docID: docRef.id });
       resetForm({});
+      setLoading(false);
+      setStatus("SUCCESS");
+      setMessage("Student added Successfully");
+    } else {
+      setLoading(false);
+      setStatus("ERROR");
+      setMessage("There was an error while adding the student.");
     }
-    setLoading(false);
-    setStatus(data.data.status);
-    setMessage(data.data.message);
   };
 
   return (

@@ -6,6 +6,18 @@ import Link from "next/link";
 import { Formik } from "formik";
 import Image from "next/image";
 import NotFound from "../public/assets/not-found.png";
+import { initializeApp } from "firebase/app";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  DocumentData,
+  getDocs,
+  getFirestore,
+  query,
+  QueryDocumentSnapshot,
+  where,
+} from "firebase/firestore";
 
 export interface Student {
   sid: number;
@@ -26,19 +38,75 @@ interface StudentRequest {
   message: string;
 }
 
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_APP_ID,
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+
+const db = getFirestore();
+
 const Home: NextPage = () => {
   const [students, setStudents] = useState<Student[]>([]);
 
   const fetchStudents = async () => {
-    const data = await axios.get<StudentRequest>(`/api/get-students`);
-    if (data.status == 200) {
-      setStudents(data.data.students);
+    const collectionRef = collection(db, "Students");
+    const docSnapshot = await getDocs(collectionRef);
+    let studentsData: Student[] = [];
+    if (docSnapshot.docs.length == 0) {
+      console.log("No Students");
+      setStudents([]);
+      return;
     }
+    for (let doc of docSnapshot.docs) {
+      studentsData.push(doc.data() as Student);
+    }
+    setStudents(studentsData);
   };
 
   useEffect(() => {
     fetchStudents();
   }, []);
+
+  const filterDocs = async (
+    docs: QueryDocumentSnapshot<DocumentData>[],
+    firstName?: string,
+    lastName?: string,
+    sid?: number
+  ) => {
+    let filteredData: QueryDocumentSnapshot<DocumentData>[] = [];
+    if (firstName) {
+      filteredData = docs.filter(
+        (doc) =>
+          doc.data().firstNameNC.slice(0, firstName.length) ===
+          firstName.toLowerCase()
+      );
+    }
+    if (lastName) {
+      filteredData = docs.filter(
+        (doc) =>
+          doc.data().lastNameNC.slice(0, lastName.length) ===
+          lastName.toLowerCase()
+      );
+    }
+    if (sid) {
+      filteredData = docs.filter(
+        (doc) =>
+          doc.data().sidSTR.slice(0, sid.toString().length) === sid.toString()
+      );
+    }
+    // console.log(students[0].data());
+    let students: Student[] = [];
+    for (let item of filteredData) {
+      students.push(item.data() as Student);
+    }
+    return students;
+  };
 
   const searchFormHandler = async (
     values: { firstName: string; lastName: string; sid: number },
@@ -52,20 +120,56 @@ const Home: NextPage = () => {
       fetchStudents();
     } else {
       const sid = values.sid === 0 ? "" : values.sid.toString();
-      const data = await axios.post<StudentRequest>(`/api/search-student`, {
-        firstName: values.firstName,
-        lastName: values.lastName,
-        sid: sid,
-      });
-      if (data.status == 200) {
-        setStudents(data.data.students);
+      if (values.firstName !== "") {
+        console.log("First name is present");
+        const queryRef = query(
+          collection(db, "Students"),
+          where("firstNameNC", ">=", values.firstName.toLowerCase())
+        );
+        const data = (await getDocs(queryRef)).docs;
+        const students = await filterDocs(
+          data,
+          values.firstName,
+          values.lastName,
+          values.sid
+        );
+        setStudents(students);
+      } else if (values.lastName !== "") {
+        console.log("Last name is present");
+        const queryRef = query(
+          collection(db, "Students"),
+          where("lastNameNC", ">=", values.lastName.toLowerCase())
+        );
+        const data = (await getDocs(queryRef)).docs;
+        const students = await filterDocs(
+          data,
+          values.firstName,
+          values.lastName,
+          values.sid
+        );
+        setStudents(students);
+      } else {
+        console.log("SID is present");
+        const queryRef = query(
+          collection(db, "Students"),
+          where("sidSTR", ">=", values.sid.toString())
+        );
+        const data = (await getDocs(queryRef)).docs;
+        const students = await filterDocs(
+          data,
+          values.firstName,
+          values.lastName,
+          values.sid
+        );
+        setStudents(students);
       }
     }
   };
 
   const deleteStudent = async (student: Student) => {
-    const data = await axios.post(`/api/delete-student`, { id: student.docID });
-    if (data.status == 200 && data.data.status == "SUCCESS") fetchStudents();
+    const docRef = doc(db, "Students", `${student.docID}`);
+    await deleteDoc(docRef);
+    fetchStudents();
   };
 
   return (
